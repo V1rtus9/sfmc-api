@@ -1,0 +1,22 @@
+{
+  "name": "sfmc-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/V1rtus9/sfmc-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/V1rtus9/sfmc-api/issues"
+  },
+  "homepage": "https://github.com/V1rtus9/sfmc-api#readme",
+  "dependencies": {
+    "sfmc-fuelsdk-node": "^2.4.0"
+  }
+}
