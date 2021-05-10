@@ -39,7 +39,7 @@ class DataExtension {
      */
     async name() {
         if(!this._name){
-            const result = await this._client.retrive('DataExtension', ['Name'], {                     
+            const result = await this._client.retrieve('DataExtension', ['Name'], {                     
                 leftOperand: 'DataExtension.CustomerKey',
                 operator: 'equals',
                 rightOperand: this._key
