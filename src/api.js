@@ -61,6 +61,38 @@ class SfmcApi {
     }
 
     /**
+     * REST - PUT
+     * @param {String} uri 
+     * @param {*} body 
+     * @returns {*}
+     */
+     put = async (uri, body) => {
+        return (await this.restClient.put({
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            json: true,
+            body
+        })).body;
+    }
+
+    /**
+     * REST - DELETE
+     * @param {String} uri 
+     * @returns {*}
+     */
+     delete = async (uri) => {
+        return (await this.restClient.delete({
+            uri,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            json: true,
+        })).body;
+    }
+
+    /**
      * SOAP
      * @param {String} type 
      * @param {Array<String>} props 
