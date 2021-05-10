@@ -56,7 +56,7 @@ class DataExtension {
      * @returns {Promise<Array<String>>}
      */
     async fields() {
-        const items = await this._client.retrive('DataExtensionField', ['Name'], {                     
+        const items = await this._client.retrieve('DataExtensionField', ['Name'], {                     
             leftOperand: 'DataExtension.CustomerKey',
             operator: 'equals',
             rightOperand: this._key
@@ -98,6 +98,14 @@ class DataExtension {
             throw new Error(`(SFMC) response: ${JSON.stringify(result)}`);
         }
         return result;
+    }
+
+    async delete() {
+
+    }
+
+    async deleteRow() {
+        
     }
 }
 

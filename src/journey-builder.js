@@ -3,18 +3,18 @@ class Journey {
 }
 
 class JourneyBuilder {
-    client;
+    _client;
 
     constructor(client){
-        this.client = client;
+        this._client = client;
     }
 
-    async findAll(page=1){
+    async getAll(page=1){
         const result = await this._client.get(`/interaction/v1/interactions?$page=${page}`);
         return result.items ? result.items : [];
     }
 
-    async find(id, versionNumber){
+    async getOne(id, versionNumber){
         const url = `/interaction/v1/interactions/${id}?versionNumber=${versionNumber}`;
         const result = await this._client.get(url);
         return result.items ? result.items : []; 
