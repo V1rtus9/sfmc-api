@@ -55,7 +55,7 @@ class JourneyBuilder {
     }
 
     async publish(id, versionNumber) {
-        const url = `/interaction/v1/interactions/publishAsync/${id}?versionNumber=${versionNumber}`,
+        const url = `/interaction/v1/interactions/publishAsync/${id}?versionNumber=${versionNumber}`;
         const result = await this._client.post(url);
         return result;
     }
