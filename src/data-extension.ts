@@ -1,43 +1,27 @@
-/**
- * 
- */
- class DataExtensionRow {
-    keys;
-    values;
 
-    /**
-     * 
-     * @param {*} keys 
-     * @param {*} values 
-     */
-    constructor(keys, values){
+export class DataExtensionRow {
+    public keys: any;
+    public values: any;
+
+    constructor(keys: any, values: any){
         this.keys = keys,
         this.values = values;
     }
 }
 
-/**
- * 
- */
-class DataExtension {
-    _key;
-    _name;
-    _client;
-    /**
-     * 
-     * @param {String} key 
-     * @param {*} client
-     */
-    constructor(key, client){
+export class DataExtension {
+
+    private _key: string;
+    private _name: string;
+    private _client: any;
+
+    constructor(key: string, client: any){
         this._key = key;
+        this._name = '';
         this._client = client;
     }
 
-    /**
-     * 
-     * @returns {Promise<String>}
-     */
-    async name() {
+    async name(): Promise<string> {
         if(!this._name){
             const result = await this._client.retrieve('DataExtension', ['Name'], {                     
                 leftOperand: 'DataExtension.CustomerKey',
@@ -51,48 +35,30 @@ class DataExtension {
         return this._name;
     }
 
-    /**
-     * 
-     * @returns {Promise<Array<String>>}
-     */
-    async fields() {
+    async fields(): Promise<Array<string>> {
         const items = await this._client.retrieve('DataExtensionField', ['Name'], {                     
             leftOperand: 'DataExtension.CustomerKey',
             operator: 'equals',
             rightOperand: this._key
         });
 
-        return items.map(x => x.Name);
+        return items.map((x: any) => x.Name);
     }
 
-    /**
-     * @returns {Promise<Array<any>>}
-     */
-    async count() {
-        //TODO
+    async count(): Promise<number> {
+        throw new Error('Not implemented!');
     }
 
-    /**
-     * @returns {Promise<Array<any>>}
-     */
-    async find() {
+    async find(): Promise<Array<any>> {
         const result = await this._client.get(`/data/v1/customobjectdata/key/${this._key}/rowset/`);
         return result.items ? result.items : [];
     }
 
-    /**
-     * @param {*} filter 
-     * @returns {Promise<Array<any>>}
-     */
-    async findMany(filter){
-        //TODO
+    async findMany(filter: any): Promise<Array<any>>{
+        throw new Error('Not implemented!');
     }
 
-    /**
-     * 
-     * @param {Array<DataExtensionRow>} data 
-     */
-    async insertOrUpdate(data) {
+    async insertOrUpdate(data: DataExtensionRow[]): Promise<Array<DataExtensionRow>> {
         const result = await this._client.post(`/hub/v1/dataevents/key:${this._key}/rowset`, data);
         if(result.errorcode){
             throw new Error(`(SFMC) response: ${JSON.stringify(result)}`);
@@ -101,15 +67,10 @@ class DataExtension {
     }
 
     async delete() {
-
+        throw new Error('Not implemented!');
     }
 
     async deleteRow() {
-        
+        throw new Error('Not implemented!');
     }
-}
-
-module.exports = {
-    DataExtension,
-    DataExtensionRow
 }
