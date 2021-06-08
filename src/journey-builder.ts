@@ -1,6 +1,7 @@
 export class Journey {
 
     public id: string;
+    public name: string;
     public status: string;
     public version: number;
 
@@ -11,6 +12,7 @@ export class Journey {
         this.id = data.id;
         this._rawData = data;
         this._client = client;
+        this.name = data.name;
         this.status = data.status;
         this.version = data.version;
     }
@@ -60,18 +62,21 @@ export class Journey {
         return result;
     }
 
-    /**
-     * @todo Needs to be tested
-     */
-    async updateVersion(data: any) {
-        delete data.id
-        delete data.version;
-        delete data.definitionId
+    async newVersion() {
+        this._rawData.status = 'Draft';
 
-        data.status = 'Draft'
+        delete this._rawData.id
+        delete this._rawData.version;
+        delete this._rawData.definitionId;
 
-        const result = await this._client.post(`/interaction/v1/interactions/`, data);
-        return result.items ? result.items : [];
+        const result = await this._client.post(`/interaction/v1/interactions/`, this._rawData);
+
+        if(!result){
+            throw new Error(`Could not create new verions of journey "${this.id}"`);
+        }
+
+        this._rawData = result;
+        this.version = result.version;
     }
 }
 

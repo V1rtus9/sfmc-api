@@ -14,4 +14,11 @@ test('Get journey', async () => {
         await builder.getJourney('03ca2399-818f-44fa-9baa-106a1d3d0728', 1);
 
     expect(journey).not.toBeNull();
-})
+});
+
+test('Create new version', async () => {
+    const journey = 
+        await builder.getJourney('03ca2399-818f-44fa-9baa-106a1d3d0728', 1);
+
+    await journey?.newVersion();
+});
