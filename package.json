@@ -2,7 +2,8 @@
   "name": "sfmc-api",
   "version": "1.0.1",
   "description": "",
-  "main": "api.js",
+  "main": "lib/api.js",
+  "types": "lib/api.d.ts",
   "scripts": {
     "build": "tsc",
     "prepare" : "npm run build",

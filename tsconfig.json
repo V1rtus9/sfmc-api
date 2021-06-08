@@ -4,7 +4,8 @@
       "strict": true,
       "outDir": "./lib",
       "declaration": true,
-      "module": "commonjs"
+      "module": "commonjs",
+      "esModuleInterop": true
     },
     "include": ["src"],
     "exclude": ["node_modules", "**/tests/*"]
