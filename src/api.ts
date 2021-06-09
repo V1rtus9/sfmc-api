@@ -1,24 +1,18 @@
 const ET_Client = require('sfmc-fuelsdk-node');
+
 import {DataExtension} from './data-extension';
 import {JourneyBuilder} from './journey-builder';
 
-interface ISfmcApiProps {
-    clientId: string | undefined;
-    subdomain: string | undefined;
-    accountId: string | undefined;
-    clientSecret: string | undefined;
-}
+import {IClient} from './interfaces/client';
+import {IApiOptions} from './interfaces/options';
 
 export class SfmcApi {
 
-    private _restClient;
-    private _soapClient;
+    private _client: IClient;
+    private _restClient: any;
+    private _soapClient: any;
     
-    /**
-     * 
-     * @param {*} options 
-     */
-    constructor({clientId, clientSecret, subdomain, accountId}: ISfmcApiProps){
+    constructor({clientId, clientSecret, subdomain, accountId}: IApiOptions){
         if(!clientId) throw new Error('Client ID is missing!');
         if(!subdomain) throw new Error('Subdomain is missing!');
         if(!accountId) throw new Error('Account ID is missing!');
@@ -40,13 +34,16 @@ export class SfmcApi {
 
         this._restClient = instance.RestClient;
         this._soapClient = instance.SoapClient;
+
+        this._client = {
+            get: this.get,
+            put: this.put,
+            post: this.post,
+            delete: this.delete,
+            retrieve: this.retrieve
+        }
     }
 
-    /**
-     * REST - GET
-     * @param {String} uri 
-     * @returns {*}
-     */
     public get = async (uri: string) => {
         return (await this._restClient.get({
             uri,
@@ -57,12 +54,6 @@ export class SfmcApi {
         })).body;
     }
 
-    /**
-     * REST - POST
-     * @param {String} uri 
-     * @param {*} body 
-     * @returns {*}
-     */
     public post = async (uri:string, body:any) => {
         return (await this._restClient.post({
             uri,
@@ -74,13 +65,7 @@ export class SfmcApi {
         })).body;
     }
 
-    /**
-     * REST - PUT
-     * @param {String} uri 
-     * @param {*} body 
-     * @returns {*}
-     */
-     public put = async (uri: string, body: any) => {
+    public put = async (uri: string, body: any) => {
         return (await this._restClient.put({
             uri,
             headers: {
@@ -91,11 +76,6 @@ export class SfmcApi {
         })).body;
     }
 
-    /**
-     * REST - DELETE
-     * @param {String} uri 
-     * @returns {*}
-     */
     public delete = async (uri: string) => {
         return (await this._restClient.delete({
             uri,
@@ -106,13 +86,6 @@ export class SfmcApi {
         })).body;
     }
 
-    /**
-     * SOAP
-     * @param {String} type 
-     * @param {Array<String>} props 
-     * @param {*} filter 
-     * @returns 
-     */
     public retrieve = async (type: string, props: any[], filter: any) => {
         return new Promise((resolve, reject) => {
             this._soapClient.retrieve(type, props, {
@@ -128,25 +101,11 @@ export class SfmcApi {
         })
     }
 
-    /**
-    * @param {String} key 
-    * @returns {DataExtension}
-    */
-    getDataExtension(key: string) {
-        return new DataExtension(key, {
-            get: this.get,
-            post: this.post,
-            retrieve: this.retrieve
-        });
+    getJourneyBuilder(): JourneyBuilder {
+        return new JourneyBuilder(this._client)
     }
 
-    /**
-    * @returns {JourneyBuilder}
-    */
-    getJourneyBuilder() {
-        return new JourneyBuilder({
-            get: this.get,
-            post: this.post
-        })
+    getDataExtension(key: string): DataExtension {
+        return new DataExtension(key, this._client);
     }
 }

@@ -1,3 +1,4 @@
+import { IClient } from "./interfaces/client";
 
 export class DataExtensionRow {
     public keys: any;
@@ -13,9 +14,9 @@ export class DataExtension {
 
     private _key: string;
     private _name: string;
-    private _client: any;
+    private _client: IClient;
 
-    constructor(key: string, client: any){
+    constructor(key: string, client: IClient){
         this._key = key;
         this._name = '';
         this._client = client;

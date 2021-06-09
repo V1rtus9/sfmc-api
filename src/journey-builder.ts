@@ -1,3 +1,5 @@
+import { IClient } from "./interfaces/client";
+
 export class Journey {
 
     public id: string;
@@ -5,10 +7,10 @@ export class Journey {
     public status: string;
     public version: number;
 
-    private _client: any;
     private _rawData: any;
+    private _client: IClient;
 
-    constructor(data: any, client: any){
+    constructor(data: any, client: IClient){
         this.id = data.id;
         this._rawData = data;
         this._client = client;
