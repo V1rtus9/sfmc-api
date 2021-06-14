@@ -1,14 +1,14 @@
 {
   "name": "sfmc-api",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "",
   "main": "lib/api.js",
   "types": "lib/api.d.ts",
   "scripts": {
     "build": "tsc",
-    "prepare" : "npm run build",
-    "prepublishOnly" : "npm test",
-    "test": "jest --config jestconfig.json"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test",
+    "test": "tsc && jest --config jestconfig.json"
   },
   "repository": {
     "type": "git",

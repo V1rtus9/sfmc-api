@@ -1,12 +1,18 @@
 const ET_Client = require('sfmc-fuelsdk-node');
 
-import {DataExtension} from './data-extension';
-import {JourneyBuilder} from './journey-builder';
+import {DataExtension, DataExtensionRow} from './data-extension';
+import {Journey, JourneyBuilder} from './journey-builder';
 
+import {ISfmcApiCache} from './interfaces/cache';
 import {IClient} from './interfaces/client';
 import {IApiOptions} from './interfaces/options';
 
-export class SfmcApi {
+export {
+    SfmcApi,
+    DataExtensionRow,
+}
+
+class SfmcApi {
 
     private _client: IClient;
     private _restClient: any;
@@ -92,7 +98,7 @@ export class SfmcApi {
                 filter
             }, (err: any, response: any) => {
                 if(err) reject(err);
-    
+                
                 const {Results, OverallStatus} = response.body;
                 OverallStatus === 'OK' ?
                     resolve(Results) :

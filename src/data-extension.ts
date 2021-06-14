@@ -1,4 +1,5 @@
 import { IClient } from "./interfaces/client";
+import { IDataFilter } from "./interfaces/filter";
 
 export class DataExtensionRow {
     public keys: any;
@@ -47,16 +48,30 @@ export class DataExtension {
     }
 
     async count(): Promise<number> {
-        throw new Error('Not implemented!');
+        const result = await this._client.get(`/data/v1/customobjectdata/key/${this._key}/rowset?$pageSize=1`);
+        return result.count;
     }
 
-    async find(): Promise<Array<any>> {
-        const result = await this._client.get(`/data/v1/customobjectdata/key/${this._key}/rowset/`);
+    async find(page:number = 1): Promise<Array<any>> {
+        const result = await this._client.get(`/data/v1/customobjectdata/key/${this._key}/rowset?$page=${page}`);
         return result.items ? result.items : [];
     }
 
-    async findMany(filter: any): Promise<Array<any>>{
-        throw new Error('Not implemented!');
+    async findMany(filter?: IDataFilter): Promise<Array<any>>{
+        const fields = await this.fields();
+        const result = await this._client.retrieve(`DataExtensionObject[${this._key}]`, fields, filter);
+
+        if(Array.isArray(result)){
+            return result.map(item => {
+                const row:any = {};
+                item.Properties.Property.forEach(({Name, Value}: any) => {
+                    row[String(Name).toLocaleLowerCase()] = Value;
+                });
+                return row;
+            });
+        }
+        
+        return [];
     }
 
     async insertOrUpdate(data: DataExtensionRow[]): Promise<Array<DataExtensionRow>> {
