@@ -2,6 +2,7 @@ import instance from './core/instance';
 
 const builder = instance.getJourneyBuilder();
 
+
 test('Get journeys', async () => {
     const journeys = 
         await builder.getJourneys();

@@ -1,4 +1,4 @@
-import { IClient } from "./interfaces/client";
+import RestClient from "./clients/rest";
 
 export class Journey {
 
@@ -7,13 +7,14 @@ export class Journey {
     public status: string;
     public version: number;
 
+    private _rest: any;
     private _rawData: any;
-    private _client: IClient;
 
-    constructor(data: any, client: IClient){
+    constructor(data: any, rest: any) {
+        this._rest = rest;
         this.id = data.id;
         this._rawData = data;
-        this._client = client;
+        
         this.name = data.name;
         this.status = data.status;
         this.version = data.version;
@@ -24,7 +25,7 @@ export class Journey {
      */
     async stop() {
         const url = `/interaction/v1/interactions/stop/${this.id}?versionNumber=${this.version}`;
-        const result = await this._client.post(url);
+        const result = await this._rest.post(url);
         return result;
     }
 
@@ -33,7 +34,7 @@ export class Journey {
      */
     async pause() {
         const url = `/interaction/v1/interactions/pause/${this.id}?versionNumber=${this.version}`;
-        const result = await this._client.post(url);
+        const result = await this._rest.post(url);
         return result;
     }
 
@@ -42,7 +43,7 @@ export class Journey {
      */
     async update(data: any) {
         const url = `/interaction/v1/interactions/?versionNumber=${this.version}`;
-        const result = await this._client.put(url, data);
+        const result = await this._rest.put(url, data);
         return result.items ? result.items : [];
     }
     
@@ -51,7 +52,7 @@ export class Journey {
      */
     async resume() {
         const url = `/interaction/v1/interactions/resume/${this.id}?versionNumber=${this.version}`;
-        const result = await this._client.post(url);
+        const result = await this._rest.post(url);
         return result;
     }
 
@@ -60,7 +61,7 @@ export class Journey {
      */   
     async publish() {
         const url = `/interaction/v1/interactions/publishAsync/${this.id}?versionNumber=${this.version}`;
-        const result = await this._client.post(url);
+        const result = await this._rest.post(url);
         return result;
     }
 
@@ -71,7 +72,7 @@ export class Journey {
         delete this._rawData.version;
         delete this._rawData.definitionId;
 
-        const result = await this._client.post(`/interaction/v1/interactions/`, this._rawData);
+        const result = await this._rest.post(`/interaction/v1/interactions/`, this._rawData);
 
         if(!result){
             throw new Error(`Could not create new verions of journey "${this.id}"`);
@@ -83,25 +84,25 @@ export class Journey {
 }
 
 export class JourneyBuilder {
-    private _client: any;
+    private _rest: RestClient;
 
-    constructor(client: any){
-        this._client = client;
+    constructor(rest: RestClient){
+        this._rest = rest;
     }
 
     async getJourney(id:string, versionNumber: number): Promise<Journey | null>{
         const result = 
-            await this._client.get(
+            await this._rest.get(
                 `/interaction/v1/interactions/${id}?versionNumber=${versionNumber}`
             );
         
-        return result ? new Journey(result, this._client) : null; 
+        return result ? new Journey(result, this._rest) : null; 
     }
 
     async getJourneys(page: number = 1): Promise<Array<Journey>>{
-        const result = await this._client.get(`/interaction/v1/interactions?$page=${page}`);
+        const result = await this._rest.get(`/interaction/v1/interactions?$page=${page}`);
         return result.items ? result.items.map((x: any) => {
-            return new Journey(x, this._client);
+            return new Journey(x, this._rest);
         }) : [];
     }
 }
