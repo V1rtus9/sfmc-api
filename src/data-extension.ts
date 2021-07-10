@@ -1,68 +1,167 @@
-import { IClient } from "./interfaces/client";
-import { IDataFilter } from "./interfaces/filter";
+import RestClient from "./clients/rest";
+import SoapClient from "./clients/soap";
+import { IDataExtensionFilter } from "./interfaces/data-extension/filter";
 
 export class DataExtensionRow {
-    public keys: any;
-    public values: any;
+    private _keys: {[key: string]: string};
+    private _values: {[key: string]: string};
 
-    constructor(keys: any, values: any){
-        this.keys = keys,
-        this.values = values;
+    constructor(keys: {[key: string]: string}, values: {[key: string]: string}){
+        this._keys = keys,
+        this._values = values;
+    }
+
+    public get keys() {
+        return this._keys;
+    }
+
+    public get values() {
+        return this._values;
+    }
+
+    getValues(): {[key: string]: string} {
+        return {
+            ...this.keys,
+            ...this.values
+        }
     }
 }
 
 export class DataExtension {
 
+    private _id: string;
     private _key: string;
     private _name: string;
-    private _client: IClient;
 
-    constructor(key: string, client: IClient){
+    private _rest: RestClient;
+    private _soap: SoapClient;
+
+    private _isSendable: string;
+    private _fields: string[] = [];
+
+    constructor(key: string, rest: RestClient, soap: SoapClient){
+        this._id = '',
         this._key = key;
         this._name = '';
-        this._client = client;
+        this._isSendable = '';
+
+        this._soap = soap;
+        this._rest = rest;
     }
 
-    async name(): Promise<string> {
-        if(!this._name){
-            const result = await this._client.retrieve('DataExtension', ['Name'], {                     
-                leftOperand: 'DataExtension.CustomerKey',
-                operator: 'equals',
-                rightOperand: this._key
-            })
+    //#region Properties
 
-            this._name = result[0].Name;
+    public get key(): string {
+        return this._key;
+    }
+
+    //#endregion
+
+    //#region  Public methods
+
+    public async name(): Promise<string> {
+        if(!this._name){
+            await this.getProperties();
         }
 
         return this._name;
     }
 
-    async fields(): Promise<Array<string>> {
-        const items = await this._client.retrieve('DataExtensionField', ['Name'], {                     
-            leftOperand: 'DataExtension.CustomerKey',
-            operator: 'equals',
-            rightOperand: this._key
+    public async isSendable(): Promise<boolean> {
+        if(!this._isSendable) {
+            await this.getProperties();
+        }
+
+        return this._isSendable === 'true';
+    }
+
+    public async fields(): Promise<Array<string>> {
+        if(this._fields.length > 0){
+            return this._fields;
+        }
+
+        /**
+         * Response example
+            {
+                OverallStatus: 'OK',
+                RequestID: '5754bc94-d629-4f01-b315-a4cc988b48e4',
+                Results: [
+                { PartnerKey: '', ObjectID: '', Name: 'Email' },
+                { PartnerKey: '', ObjectID: '', Name: 'Age' },
+                { PartnerKey: '', ObjectID: '', Name: 'CreatedAt' },
+                { PartnerKey: '', ObjectID: '', Name: 'SubscriberKey' },
+                { PartnerKey: '', ObjectID: '', Name: 'Name' }
+                ]
+            }
+         */
+        const {Results}: any = await this._soap.retrieve('DataExtensionField', ['Name'], {
+            filter:  {                     
+                leftOperand: 'DataExtension.CustomerKey',
+                operator: 'equals',
+                rightOperand: this._key
+            }
         });
 
-        return items.map((x: any) => x.Name);
+        this._fields = Results.map((x: any) => x.Name);
+        return this._fields;
     }
 
-    async count(): Promise<number> {
-        const result = await this._client.get(`/data/v1/customobjectdata/key/${this._key}/rowset?$pageSize=1`);
-        return result.count;
+    public async count(): Promise<number> {
+        /**
+        *  Response example     
+            {
+                links: {
+                    self: '/v1/customobjectdata/token/3934bf37-a0a4-4312-94ba-b4b071079146/rowset?$page=1',
+                    next: '/v1/customobjectdata/token/3934bf37-a0a4-4312-94ba-b4b071079146/rowset?$page=2' 
+                },
+                requestToken: '3934bf37-a0a4-4312-94ba-b4b071079146',
+                tokenExpireDateUtc: '2021-07-11T20:11:29.59',
+                customObjectId: '8a16c900-bbe1-eb11-b826-48df37dc1641',
+                customObjectKey: '876EF229-5F56-4219-AEBC-2DE57D24EA75',
+                pageSize: 1,
+                page: 1,
+                count: 5,
+                top: 0,
+                items: [ { keys: [Object], values: [Object] } ]
+            }
+        *
+        */
+        const response = await this._rest.get(`/data/v1/customobjectdata/key/${this._key}/rowset?$pageSize=1`);
+        return response.count;
     }
 
-    async find(page:number = 1): Promise<Array<any>> {
-        const result = await this._client.get(`/data/v1/customobjectdata/key/${this._key}/rowset?$page=${page}`);
-        return result.items ? result.items : [];
-    }
+    public async find(options?: {fields?: string[], filter?: IDataExtensionFilter}): Promise<Array<{[key: string]: string}>>{
+        const fields = options?.fields || await this.fields();
+        /**
+         * Response example
+            {
+                OverallStatus: 'OK',
+                RequestID: '27af3534-9be2-4705-a002-b56711b7550c',
+                Results: [
+                    {
+                        PartnerKey: '',
+                        ObjectID: '',
+                        Type: 'DataExtensionObject',
+                        Properties: {
+                           Property: [
+                                { Name: 'Email', Value: 'alex@hotmail.ee' },
+                                { Name: 'Name', Value: 'Alex' },
+                                { Name: 'CreatedAt', Value: '7/10/2021 2:28:20 PM' },
+                                { Name: 'SubscriberKey', Value: '0001' },
+                                { Name: 'Age', Value: '15' }
+                            ]
+                        }
+                    }
+                ]
+            }
+         *
+         */
+        const {Results} = await this._soap.retrieve(`DataExtensionObject[${this._key}]`, fields, {
+            filter: options?.filter
+        });
 
-    async findMany(filter?: IDataFilter): Promise<Array<any>>{
-        const fields = await this.fields();
-        const result = await this._client.retrieve(`DataExtensionObject[${this._key}]`, fields, filter);
-
-        if(Array.isArray(result)){
-            return result.map(item => {
+        if(Array.isArray(Results)){
+            return Results.map(item => {
                 const row:any = {};
                 item.Properties.Property.forEach(({Name, Value}: any) => {
                     row[String(Name).toLocaleLowerCase()] = Value;
@@ -70,23 +169,99 @@ export class DataExtension {
                 return row;
             });
         }
-        
+
         return [];
     }
 
-    async insertOrUpdate(data: DataExtensionRow[]): Promise<Array<DataExtensionRow>> {
-        const result = await this._client.post(`/hub/v1/dataevents/key:${this._key}/rowset`, data);
-        if(result.errorcode){
-            throw new Error(`(SFMC) response: ${JSON.stringify(result)}`);
+    /**
+     * This methods uses unofficial rest endpoint, there is no guarantee that it will be working in future.
+     * As opposed to the 'find' method there is no any issue working with shared data extension, data is accessible from any business unit.
+     */
+    public async find2(page: number = 1): Promise<DataExtensionRow[]> {
+       /**
+        *  Response example     
+            {
+                links: {
+                    self: '/v1/customobjectdata/token/3934bf37-a0a4-4312-94ba-b4b071079146/rowset?$page=1',
+                    next: '/v1/customobjectdata/token/3934bf37-a0a4-4312-94ba-b4b071079146/rowset?$page=2' 
+                },
+                requestToken: '3934bf37-a0a4-4312-94ba-b4b071079146',
+                tokenExpireDateUtc: '2021-07-11T20:11:29.59',
+                customObjectId: '8a16c900-bbe1-eb11-b826-48df37dc1641',
+                customObjectKey: '876EF229-5F56-4219-AEBC-2DE57D24EA75',
+                pageSize: 1,
+                page: 1,
+                count: 5,
+                top: 0,
+                items: [ { keys: [Object], values: [Object] } ]
+            }
+        *
+        */
+        const {items} = await this._rest.get(`/data/v1/customobjectdata/key/${this._key}/rowset?$page=${page}`);
+
+        if(Array.isArray(items)){
+            return items.map(item => {
+                return new DataExtensionRow(item.keys, item.values);
+            })
         }
-        return result;
+
+        return [];
     }
 
-    async delete() {
-        throw new Error('Not implemented!');
+    public async insertOrUpdate(data: DataExtensionRow[]): Promise<Array<DataExtensionRow>> {
+        return new Promise((resolve, reject) => {
+            this._rest.post(`/hub/v1/dataevents/key:${this._key}/rowset`, data.map(x => {
+                return {
+                    keys: x.keys,
+                    values: x.values
+                }
+            }))
+            .then(result => {
+                result.errorcode ? reject(result) : resolve(result);
+            })
+            .catch(e => reject(e.message));
+        })
     }
 
-    async deleteRow() {
-        throw new Error('Not implemented!');
+    //#endregion 
+
+    //#region Private methods
+
+    private async getProperties() {
+        const props = [
+            'Name',
+            'ObjectID',
+            'IsSendable',
+            'CustomerKey'
+        ];
+
+        /**
+         * 
+            {
+                OverallStatus: 'OK',
+                RequestID: 'bd41831c-0b28-4d72-bb81-ac46f28c7c57',
+                Results: [
+                    {
+                        PartnerKey: '',
+                        ObjectID: '30336247-bee1-eb11-b826-48df37dc1641',
+                        CustomerKey: '0F63D43C-50D9-45B7-8D1F-D9B1C92D8F40',
+                        Name: 'Test Data Extension 3',
+                        IsSendable: 'false'
+                    }
+                ]
+            }
+         * 
+         */
+        const {Results}: any = await this._soap.retrieve('DataExtension', props, {                     
+            filter: { leftOperand: 'DataExtension.CustomerKey',
+             operator: 'equals',
+             rightOperand: this._key}
+        });
+
+        this._name = Results[0].Name;
+        this._id = Results[0].ObjectID;
+        this._isSendable = Results[0].IsSendable;
     }
+
+    //#endregion
 }
