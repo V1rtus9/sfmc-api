@@ -1,6 +1,16 @@
-export interface IApiOptions {
-    clientId: string | undefined;
-    subdomain: string | undefined;
-    accountId: string | undefined;
-    clientSecret: string | undefined;
+
+export interface IClientOptins {
+    auth: {
+        clientId: string;
+        clientSecret: string;
+    },
+    origin: string;
+    headers?: {[key: string]: string}
+}
+
+export interface IApiClientOptions {
+    clientId?: string;
+    subdomain?: string;
+    accountId?: string;
+    clientSecret?: string;
 }
