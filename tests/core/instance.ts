@@ -1,5 +1,5 @@
 require('dotenv').config();
-import {SfmcApi} from 'sfmc-api';
+import {SfmcApi} from '../../lib/api';
 
 const instance = new SfmcApi({
     clientId: process.env.CLIENT_ID,
