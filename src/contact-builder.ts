@@ -28,6 +28,9 @@ export class ContactBuilder {
         return dataExtension;
     }
 
+    /**
+     * Not implemented
+     */
     async updateDataExtension(key: string) {
         throw new Error('Not implemented');
     }
