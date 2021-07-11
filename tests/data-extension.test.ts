@@ -97,17 +97,17 @@ describe('DataExtension', () => {
     });
     
     test('Get rows', async () => {
-        const rows = await de.find();
+        const rows = await de.rows();
         expect(rows).toHaveLength(5);
     });
 
     test('Get rows (unofficial)', async () => {
-        const rows = await de.find2();
+        const rows = await de.rows2();
         expect(rows).toHaveLength(5); 
     })
     
     test('Get rows using simple filter', async () => {
-        const rows = await de.find({filter: {
+        const rows = await de.rows({filter: {
             leftOperand: 'SubscriberKey',
             operator: 'equals',
             rightOperand: '0001'
@@ -117,7 +117,7 @@ describe('DataExtension', () => {
     });
     
     test('Get rows using complex filter', async () => {
-        const rows = await de.find({filter: {
+        const rows = await de.rows({filter: {
             leftOperand: {
                 leftOperand: 'SubscriberKey',
                 operator: 'equals',
@@ -143,7 +143,7 @@ describe('DataExtension', () => {
     });
 
     test('Get rows using more complex filter', async () => {
-        const rows = await de.find({filter: {
+        const rows = await de.rows({filter: {
             leftOperand: {
                 leftOperand: {
                     leftOperand: 'Name',

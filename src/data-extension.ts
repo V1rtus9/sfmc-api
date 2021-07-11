@@ -130,7 +130,7 @@ export class DataExtension {
         return response.count;
     }
 
-    public async find(options?: {fields?: string[], filter?: IDataExtensionFilter}): Promise<Array<{[key: string]: string}>>{
+    public async rows(options?: {fields?: string[], filter?: IDataExtensionFilter}): Promise<Array<{[key: string]: string}>>{
         const fields = options?.fields || await this.fields();
         /**
          * Response example
@@ -175,9 +175,9 @@ export class DataExtension {
 
     /**
      * This methods uses unofficial rest endpoint, there is no guarantee that it will be working in future.
-     * As opposed to the 'find' method there is no any issue working with shared data extension, data is accessible from any business unit.
+     * As opposed to the 'rows' method there is no any issue working with shared data extension, data is accessible from any business unit.
      */
-    public async find2(page: number = 1): Promise<DataExtensionRow[]> {
+    public async rows2(page: number = 1): Promise<DataExtensionRow[]> {
        /**
         *  Response example     
             {

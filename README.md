@@ -18,8 +18,8 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
     * isSendable
     * fields
     * count
-    * find
-    * find2 (unofficial)
+    * rows
+    * rows2 (unofficial)
     * insertOrUpdate
 * Journey Builder
     * getJourney
