@@ -26,7 +26,7 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
     * getJourneys
         * page
         * pageSize
-        * nameOrDescription
+        * nameOrDescription (search journeys by name or description)
     * getJourneysCount
 * Journey
     * stop
