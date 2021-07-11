@@ -17,6 +17,19 @@ describe('Journey Builder', () => {
         expect(journeys.length).toBeGreaterThan(0);
     });
 
+    test('Get journeys (pageSize)', async () => {
+        /**
+         * Parameter 'page' is mandatory to use with 'pageSize' otherwise default (50) will be used
+         */
+        const journeys = 
+            await builder.getJourneys({
+                page: 1,
+                pageSize: 5
+            });
+
+        expect(journeys.length).toEqual(5);
+    });
+
     test('Get journeys count', async () => {
         const count = 
             await builder.getJourneysCount();

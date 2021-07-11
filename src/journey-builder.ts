@@ -73,6 +73,9 @@ export class Journey {
 
 export class JourneyBuilder {
     private _rest: RestClient;
+    private _paramsIgnoreSymbol$: string[] = [
+        'nameOrDescription'
+    ]
 
     constructor(rest: RestClient){
         this._rest = rest;
@@ -167,8 +170,14 @@ export class JourneyBuilder {
         return response ? new Journey(response, this._rest) : null; 
     }
 
-    public async getJourneys(page: number = 1): Promise<Array<Journey>>{
-        const result = await this._rest.get(`/interaction/v1/interactions?$page=${page}`);
+    public async getJourneys(props?: {nameOrDescription?: string, page?: number, pageSize?: number}): Promise<Array<Journey>>{
+        const params: any = props || {};
+        const query = new URLSearchParams();
+        Object.keys(params).forEach(key => {
+            return query.append(
+                this._paramsIgnoreSymbol$.includes(key) ? key : '$' + key, params[key])
+        });  
+        const url = `/interaction/v1/interactions?${query.toString()}`;
 
         /**
          * 
@@ -219,9 +228,9 @@ export class JourneyBuilder {
                 ]
             }
          */
-        return result.items ? result.items.map((x: any) => {
-            return new Journey(x, this._rest);
-        }) : [];
+        const {items} = await this._rest.get(url);
+        
+        return items ? items.map((item: any) => new Journey(item, this._rest)) : [];
     }
 
     public async getJourneysCount(): Promise<number> {
