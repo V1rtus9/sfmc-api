@@ -69,8 +69,8 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
 ##### Step 4. Start working with api
 
 ```js
-    const contactBuilder = instance.getContactBuilder();
-    const de = contactBuilder.getDataExtension(`external key`);
+    const cb = instance.getContactBuilder();
+    const de = cb.getDataExtension(`external key`);
     
     const rows = de.rows();
     const name = de.name();
