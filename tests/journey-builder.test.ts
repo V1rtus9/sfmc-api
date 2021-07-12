@@ -41,7 +41,7 @@ describe('Journey Builder', () => {
     });
 
     test('Create new version', async () => {
-        journey = await journey.newVersion();
+        await journey.newVersion();
     });
 
     test('Publish', async () => {    

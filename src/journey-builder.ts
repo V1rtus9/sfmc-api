@@ -18,8 +18,8 @@ export class Journey {
 
     public id: string;
     public name: string;
-    public status: string;
     public version: number;
+    public status: JourneyStatus;
 
     private rest_: RestClient;
 
