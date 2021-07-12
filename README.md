@@ -37,3 +37,48 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
     * newVersion
 
 
+## How to use
+
+##### Step 1. Install the package
+
+```
+    npm i sfmc-api
+```
+
+##### Step 2. Require the package
+```js
+    import {SfmcApi} from 'sfmc-api';
+```
+
+##### Step 3. Create api instance
+```js
+    const instance = new SfmcApi({
+        accountId,
+        clientId,
+        subdomain,
+        clientSecret
+    });
+```
+
+##### Step 4. Start working with api
+
+```js
+    const contactBuilder = instance.getContactBuilder();
+    const de = contactBuilder.getDataExtension(`external key`);
+    
+    const rows = de.rows();
+    const name = de.name();
+    const count = de.count();
+    const fields = de.fields();
+```
+
+```js
+    const journeyBuilder = instance.getJourneyBuilder();
+    const journey = journeyBuilder.getJourney(`id`);
+    const journeys = journeyBuilder.getJourneys();
+```
+
+## Usage:
+
+Check https://github.com/V1rtus9/sfmc-api/tree/master/tests for examples.
+
