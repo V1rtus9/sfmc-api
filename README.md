@@ -46,13 +46,14 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
     npm i sfmc-api
 ```
 
-##### Step 2. Require/import  the package
-```js
-    const {SfmcApi} = require('sfmc-api');
-```
+##### Step 2. Import/require the package
 
 ```js
     import {SfmcApi} from 'sfmc-api';
+```
+
+```js
+    const {SfmcApi} = require('sfmc-api');
 ```
 
 ##### Step 3. Create api instance
