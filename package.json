@@ -15,7 +15,7 @@
     "url": "git+https://github.com/V1rtus9/sfmc-api.git"
   },
   "author": "V1rtus9",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/V1rtus9/sfmc-api/issues"
   },
