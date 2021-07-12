@@ -79,9 +79,11 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
 ```
 
 ```js
-    const journeyBuilder = instance.getJourneyBuilder();
-    const journey = journeyBuilder.getJourney(`id`);
-    const journeys = journeyBuilder.getJourneys();
+    const jb = instance.getJourneyBuilder();
+    
+    const journeys = jb.getJourneys();
+    const journey = jb.getJourney(`id`);
+    const journeysCount = jb.getJourneysCount();
 ```
 
 ## Usage:
