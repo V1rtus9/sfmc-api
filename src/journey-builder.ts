@@ -42,7 +42,7 @@ export class Journey {
                      * 
                      * Error example
                         {
-                            message: 'An interaction must be in published or unpublished status to be paused.',
+                            message: 'Published/Paused/Unpublished interaction matching criteria not found.',
                             errorcode: 10000,
                             documentation: ''
                         }
@@ -84,7 +84,7 @@ export class Journey {
                      * 
                      * Error example
                         {
-                            message: 'An interaction must be in published or unpublished status to be paused.',
+                            message: 'An interaction must be in paused status to be resumed.',
                             errorcode: 10000,
                             documentation: ''
                         }
