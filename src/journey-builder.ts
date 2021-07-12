@@ -1,89 +1,164 @@
 import RestClient from './clients/rest';
 
+export enum JourneyStatus {
+    Draft = 'Draft',
+    Stopped = 'Stopped', 
+    Deleted = 'Deleted',
+    Published = 'Published',
+    Unpublished = 'Unpublished', 
+    ScheduledToPublish = 'ScheduledToPublish'
+}
+
 export class Journey {
+    /**
+     * Raw journey
+     * Objects that comes from MC
+     */
+    private raw: any;
 
     public id: string;
     public name: string;
     public status: string;
     public version: number;
 
-    private _rest: any;
-    private _rawData: any;
+    private rest_: RestClient;
 
-    constructor(data: any, rest: any) {
-        this._rest = rest;
-        this.id = data.id;
-        this._rawData = data;
+    constructor(data: any, rest: RestClient) {
+        this.raw = data;
+        this.rest_ = rest;
         
+        this.id = data.id;
         this.name = data.name;
         this.status = data.status;
         this.version = data.version;
     }
 
-    /**
-     * Returns raw journey object that comes from Marketing Cloud
-     */
-    public get raw() {
-        return this._rawData;
+    async stop(): Promise<{status: string}> {
+        return new Promise((resolve, reject) => {
+            this.rest_.post(`/interaction/v1/interactions/stop/${this.id}?versionNumber=${this.version}`, {})
+                .then(response => {
+                    /**
+                     * { status: 'Accepted' }
+                     * 
+                     * Error example
+                        {
+                            message: 'An interaction must be in published or unpublished status to be paused.',
+                            errorcode: 10000,
+                            documentation: ''
+                        }
+                    *
+                    */
+                   response.errorcode ? reject(response) : resolve(response);
+                })
+                .catch(e => reject(e));
+        });
     }
 
-    async stop() {
-        const url = `/interaction/v1/interactions/stop/${this.id}?versionNumber=${this.version}`;
-        const result = await this._rest.post(url);
-        return result;
+    async pause(): Promise<{status: string}> {
+        return new Promise((resolve, reject) => {
+            this.rest_.post(`/interaction/v1/interactions/pause/${this.id}?versionNumber=${this.version}`, {})
+                .then(response => {
+                    /**
+                     * { status: 'Accepted' }
+                     * 
+                     * Error example
+                        {
+                            message: 'An interaction must be in published or unpublished status to be paused.',
+                            errorcode: 10000,
+                            documentation: ''
+                        }
+                    *
+                    */
+                   response.errorcode ? reject(response) : resolve(response);
+                })
+                .catch(e => reject(e));
+        });
     }
 
-    async pause() {
-        const url = `/interaction/v1/interactions/pause/${this.id}?versionNumber=${this.version}`;
-        const result = await this._rest.post(url);
-        return result;
+    async resume(): Promise<{status: string}> {
+        return new Promise((resolve, reject) => {
+            this.rest_.post(`/interaction/v1/interactions/resume/${this.id}?versionNumber=${this.version}`, {})
+                .then(response => {
+                    /**
+                     * { status: 'Accepted' }
+                     * 
+                     * Error example
+                        {
+                            message: 'An interaction must be in published or unpublished status to be paused.',
+                            errorcode: 10000,
+                            documentation: ''
+                        }
+                    *
+                    */
+                   response.errorcode ? reject(response) : resolve(response);
+                })
+                .catch(e => reject(e));
+        });
     }
 
-    async resume() {
-        const url = `/interaction/v1/interactions/resume/${this.id}?versionNumber=${this.version}`;
-        const result = await this._rest.post(url);
-        return result;
+    async update(data: any): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.rest_.put(`/interaction/v1/interactions/?versionNumber=${this.version}`, data)
+                .then(response => {
+                    response.errorcode ? reject(response) : resolve(response);
+                })
+                .catch(e => reject(e));
+        })
     }
 
-    async update(data: any) {
-        const url = `/interaction/v1/interactions/?versionNumber=${this.version}`;
-        const result = await this._rest.put(url, data);
-        return result;
+    async publish(): Promise<{status: string}> {
+        return new Promise((resolve, reject) => {
+            this.rest_.post(`/interaction/v1/interactions/publishAsync/${this.id}?versionNumber=${this.version}`, {})
+                .then(response => {
+                    /**
+                     * { status: 'Accepted' }
+                     * 
+                     * Error example
+                        {
+                            message: 'An interaction must be in published or unpublished status to be paused.',
+                            errorcode: 10000,
+                            documentation: ''
+                        }
+                    *
+                    */
+                   response.errorcode ? reject(response) : resolve(response);
+                })
+                .catch(e => reject(e));
+        });
     }
 
-    async publish() {
-        const url = `/interaction/v1/interactions/publishAsync/${this.id}?versionNumber=${this.version}`;
-        const result = await this._rest.post(url);
-        return result;
-    }
-
-    async newVersion() {
-
-        delete this._rawData.id
-        delete this._rawData.version;
-        delete this._rawData.definitionId;
-
-        this._rawData.status = 'Draft';
-        const result = await this._rest.post(`/interaction/v1/interactions/`, this._rawData);
-
-        this._rawData = result;
-        this.version = result.version;
+    async newVersion(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            delete this.raw.id
+            delete this.raw.version;
+            delete this.raw.definitionId;
+    
+            this.raw.status = JourneyStatus.Draft;
+            this.rest_.post(`/interaction/v1/interactions`, this.raw)
+                .then(response => {
+                    response.errorcode ? reject(response) : (() => {
+                        resolve();
+                        this.raw = response;
+                        this.version = response.version;
+                    })();
+                })
+                .catch(e => reject(e));
+        })
     }
 }
 
 export class JourneyBuilder {
-    private _rest: RestClient;
-    private _paramsIgnoreSymbol$: string[] = [
-        'nameOrDescription'
-    ]
+    private rest_: RestClient;
 
     constructor(rest: RestClient){
-        this._rest = rest;
+        this.rest_ = rest;
     }
 
-    public async getJourney(id:string, versionNumber?: number): Promise<Journey | null> {
-        /**
+    public async getJourney(id:string, versionNumber?: number): Promise<Journey> {
+       return new Promise((resolve, reject) => {
+            /**
          * 
+         * Response example
             {
                 id: '03ca2399-818f-44fa-9baa-106a1d3d0728',
                 key: '7f931f23-2516-9a36-e5d6-7f82b098263f',
@@ -161,22 +236,41 @@ export class JourneyBuilder {
                 scheduledStatus: 'Draft'
             }
          * 
+         * Error response example
+         * 
+            {
+                documentation: 'https://developer.salesforce.com/docs/atlas.en-us.mc-apis.meta/mc-apis/error-handling.htm',
+                errorcode: 404,
+                message: 'Not Found'
+            }
          */
-        const response = 
-            await this._rest.get(
-                `/interaction/v1/interactions/${id}${versionNumber ? `?versionNumber=${versionNumber}` : ''}`
-            );
-        
-        return response ? new Journey(response, this._rest) : null; 
+        this.rest_.get(`/interaction/v1/interactions/${id}${versionNumber ? `?versionNumber=${versionNumber}` : ''}`)
+            .then(response => {
+                response.errorcode ? reject(response) : resolve(new Journey(response, this.rest_));
+            })
+            .catch(e => reject(e));
+       })
     }
 
-    public async getJourneys(props?: {nameOrDescription?: string, page?: number, pageSize?: number}): Promise<Array<Journey>>{
-        const params: any = props || {};
+    public async getJourneys(props?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'} }): Promise<Array<Journey>>{
+        return new Promise((resolve, reject) => {
+            const params: any = props || {};
         const query = new URLSearchParams();
+
         Object.keys(params).forEach(key => {
-            return query.append(
-                this._paramsIgnoreSymbol$.includes(key) ? key : '$' + key, params[key])
-        });  
+            switch(key){
+                case 'page':
+                case 'pageSize':
+                    query.append('$' + key, params[key])
+                    break;
+                case 'orderBy':
+                    query.append('$' + key, `${params[key].column} ${params[key].direction}`)
+                    break;
+                default:
+                    query.append(key, params[key]);
+            }
+        }); 
+        
         const url = `/interaction/v1/interactions?${query.toString()}`;
 
         /**
@@ -228,14 +322,24 @@ export class JourneyBuilder {
                 ]
             }
          */
-        const {items} = await this._rest.get(url);
-        
-        return items ? items.map((item: any) => new Journey(item, this._rest)) : [];
+        this.rest_.get(url)
+            .then(response => {
+                response.errorcode ? reject(response) : resolve(
+                    response.items ? 
+                    response.items.map((item: any) => new Journey(item, this.rest_)) : [])
+            })
+            .catch(e => reject(e));
+        })
     }
 
     public async getJourneysCount(): Promise<number> {
-        const response = await this._rest.get(`/interaction/v1/interactions`);
-        return response.count;
+        return new Promise((resolve, reject) => {
+            this.rest_.get(`/interaction/v1/interactions?$page=1&$pageSize=1`)
+                .then(response => {
+                    response.errorcode ? reject(response) : resolve(response.count);
+                })
+                .catch(e => reject(e));
+        })
     }
 }
 

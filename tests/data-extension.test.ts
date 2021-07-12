@@ -6,12 +6,12 @@ import { EDataExtensionFieldType } from '../lib/interfaces/data-extension/field'
 describe('DataExtension', () => {
 
     let de: DataExtension;
-    const dataExtensionName: string = 'Test Data Extension 3';
+    const dataExtensionName: string = 'Test Data Extension';
 
     test('Create', async () => {
         de = await instance.getContactBuilder().createDataExtension({
             name: dataExtensionName,
-            description: 'Test data extenson created by sfmc-api package',
+            description: 'Test data extenson created by sfmc-api package, will be delete at the end of the test',
             fields: [
                 {
                     maxLength: 50,
