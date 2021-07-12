@@ -1,7 +1,3 @@
-interface IKeyValuePairProps {
-    [key: string]: string | IKeyValuePairProps
-}
-
 export default class SoapClient {
     private _instance: any;
 

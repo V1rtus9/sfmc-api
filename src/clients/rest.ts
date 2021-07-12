@@ -1,7 +1,3 @@
-//@ts-ignore
-import FuelRest from 'fuel-rest';
-import {IClientOptins} from "../interfaces/options";
-
 export default class RestClient {
 
     private _instance: any;
