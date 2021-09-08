@@ -1,3 +1,7 @@
+interface IRequestOptions {
+    headers?: {[key: string]: string}
+}
+
 export default class RestClient {
 
     private _instance: any;
@@ -6,13 +10,14 @@ export default class RestClient {
         this._instance = instance;
     }
 
-    public get = async (uri: string) => {
+    public get = async (uri: string, options?: IRequestOptions) => {
         return (await this._instance.get({
             uri,
             headers: {
               'Content-Type': 'application/json',
+              ...options?.headers
             },
-            json: true
+            json: true,
         })).body;
     }
 
