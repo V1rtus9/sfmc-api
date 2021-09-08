@@ -48,7 +48,7 @@ export class Journey {
                         }
                     *
                     */
-                   response.errorcode ? reject(response) : resolve(response);
+                   response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
                 .catch(e => reject(e));
         });
@@ -69,7 +69,7 @@ export class Journey {
                         }
                     *
                     */
-                   response.errorcode ? reject(response) : resolve(response);
+                   response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
                 .catch(e => reject(e));
         });
@@ -90,7 +90,7 @@ export class Journey {
                         }
                     *
                     */
-                   response.errorcode ? reject(response) : resolve(response);
+                   response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
                 .catch(e => reject(e));
         });
@@ -100,7 +100,7 @@ export class Journey {
         return new Promise((resolve, reject) => {
             this.rest_.put(`/interaction/v1/interactions/?versionNumber=${this.version}`, data)
                 .then(response => {
-                    response.errorcode ? reject(response) : resolve(response);
+                    response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
                 .catch(e => reject(e));
         })
@@ -121,7 +121,7 @@ export class Journey {
                         }
                     *
                     */
-                   response.errorcode ? reject(response) : resolve(response);
+                   response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
                 .catch(e => reject(e));
         });
@@ -136,7 +136,7 @@ export class Journey {
             this.raw.status = JourneyStatus.Draft;
             this.rest_.post(`/interaction/v1/interactions`, this.raw)
                 .then(response => {
-                    response.errorcode ? reject(response) : (() => {
+                    response.hasOwnProperty('errorcode') ? reject(response) : (() => {
                         resolve();
                         this.raw = response;
                         this.version = response.version;
@@ -246,7 +246,7 @@ export class JourneyBuilder {
          */
         this.rest_.get(`/interaction/v1/interactions/${id}${versionNumber ? `?versionNumber=${versionNumber}` : ''}`)
             .then(response => {
-                response.errorcode ? reject(response) : resolve(new Journey(response, this.rest_));
+                response.hasOwnProperty('errorcode') ? reject(response) : resolve(new Journey(response, this.rest_));
             })
             .catch(e => reject(e));
        })
@@ -324,7 +324,7 @@ export class JourneyBuilder {
          */
         this.rest_.get(url)
             .then(response => {
-                response.errorcode ? reject(response) : resolve(
+                response.hasOwnProperty('errorcode') ? reject(response) : resolve(
                     response.items ? 
                     response.items.map((item: any) => new Journey(item, this.rest_)) : [])
             })
@@ -336,7 +336,7 @@ export class JourneyBuilder {
         return new Promise((resolve, reject) => {
             this.rest_.get(`/interaction/v1/interactions?$page=1&$pageSize=1`)
                 .then(response => {
-                    response.errorcode ? reject(response) : resolve(response.count);
+                    response.hasOwnProperty('errorcode') ? reject(response) : resolve(response.count);
                 })
                 .catch(e => reject(e));
         })
