@@ -3,7 +3,7 @@ import instance from './core/instance';
 import { DataExtension, DataExtensionRow } from '../lib/data-extension';
 import { EDataExtensionFieldType } from '../lib/interfaces/data-extension/field';
 
-describe('DataExtension', () => {
+describe.skip('DataExtension', () => {
 
     let de: DataExtension;
     const dataExtensionName: string = 'Test Data Extension';

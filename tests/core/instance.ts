@@ -1,7 +1,11 @@
-import {SfmcApi} from '../../lib/api';
+import { SfmcConfig } from './config';
+import { SfmcApi } from '../../lib/api';
 
-const instance = new SfmcApi({
-    ...require('../../config.json')
+SfmcConfig.init();
+
+export default new SfmcApi({
+    clientId: SfmcConfig.clientId,
+    accountId: SfmcConfig.accountId,
+    subdomain: SfmcConfig.subdomain,
+    clientSecret: SfmcConfig.clientSecret,
 });
-
-export default instance;

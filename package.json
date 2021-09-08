@@ -21,8 +21,9 @@
   },
   "homepage": "https://github.com/V1rtus9/sfmc-api#readme",
   "dependencies": {
-    "uuid": "^8.3.2",
-    "sfmc-fuelsdk-node": "^2.4.0"
+    "axios": "^0.21.4",
+    "sfmc-fuelsdk-node": "^2.4.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "jest": "^27.0.4",
