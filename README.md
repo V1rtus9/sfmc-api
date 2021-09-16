@@ -93,3 +93,4 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
 ## Versions:
 
    * 1.0.0
+   * 1.1.0
