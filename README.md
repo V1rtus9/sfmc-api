@@ -88,7 +88,7 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
 
 ## Usage:
 
-Check https://github.com/V1rtus9/sfmc-api/tree/master/tests for examples.
+[`Examples`](https://github.com/V1rtus9/sfmc-api/tree/master/tests)
 
 ## Versions:
 
