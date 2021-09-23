@@ -86,11 +86,11 @@ export class DataExtension {
                 OverallStatus: 'OK',
                 RequestID: '5754bc94-d629-4f01-b315-a4cc988b48e4',
                 Results: [
-                { PartnerKey: '', ObjectID: '', Name: 'Email' },
-                { PartnerKey: '', ObjectID: '', Name: 'Age' },
-                { PartnerKey: '', ObjectID: '', Name: 'CreatedAt' },
-                { PartnerKey: '', ObjectID: '', Name: 'SubscriberKey' },
-                { PartnerKey: '', ObjectID: '', Name: 'Name' }
+                    { PartnerKey: '', ObjectID: '', Name: 'Email' },
+                    { PartnerKey: '', ObjectID: '', Name: 'Age' },
+                    { PartnerKey: '', ObjectID: '', Name: 'CreatedAt' },
+                    { PartnerKey: '', ObjectID: '', Name: 'SubscriberKey' },
+                    { PartnerKey: '', ObjectID: '', Name: 'Name' }
                 ]
             }
          */
