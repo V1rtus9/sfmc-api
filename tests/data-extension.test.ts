@@ -1,17 +1,18 @@
+import crypto from 'crypto';
 import instance from './core/instance';
 
 import { DataExtension, DataExtensionRow } from '../lib/data-extension';
 import { EDataExtensionFieldType } from '../lib/interfaces/data-extension/field';
 
-describe.skip('DataExtension', () => {
+describe('DataExtension', () => {
 
     let de: DataExtension;
-    const dataExtensionName: string = 'Test Data Extension';
+    const dataExtensionName: string = crypto.randomBytes(20).toString('hex'); //'Test Data Extension';
 
     test('Create', async () => {
         de = await instance.getContactBuilder().createDataExtension({
             name: dataExtensionName,
-            description: 'Test data extenson created by sfmc-api package, will be delete at the end of the test',
+            description: 'Test data extension created by sfmc-api package, will be delete at the end of the test',
             fields: [
                 {
                     maxLength: 50,
