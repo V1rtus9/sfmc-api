@@ -1,8 +1,10 @@
 type TFilterOperator = 
     'OR' |
     'AND' |
+    'isNull' |
     'equals' | 
     'lessThan' |
+    'isNotNull' |
     'notEquals' | 
     'greaterThan' | 
     'lessThanOrEqual' |
