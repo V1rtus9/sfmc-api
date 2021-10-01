@@ -7,11 +7,11 @@ import RestClient from './clients/rest';
 import {
     DataExtension, 
     DataExtensionRow} from './data-extension';
+import { ContentBuilder } from './content-builder';
 import { JourneyBuilder } from './journey-builder';
 import { ContactBuilder } from './contact-builder';
 import { ITokenContext } from './interfaces/context';
 import { IApiClientOptions } from './interfaces/options';
-
 export {
     SfmcApi,
     Platform,
@@ -47,8 +47,24 @@ class SfmcApi {
         this._soapClient = new SoapClient(instance.SoapClient);
     }
 
+    //#region Getters 
+
+    public get rest(): RestClient {
+        return this._restClient;
+    }
+
+    public get soap(): SoapClient {
+        return this._soapClient;
+    }
+
+    //#endregion
+
     getContext(): Promise<ITokenContext> {
         return this._restClient.get('/platform/v1/tokenContext');
+    }
+
+    getContentBuilder(): ContentBuilder {
+        return new ContentBuilder(this._restClient, this._soapClient);
     }
 
     getContactBuilder(): ContactBuilder {
