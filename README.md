@@ -13,6 +13,9 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
     * getDataExtension
     * createDataExtension
     * deleteDataExtension
+* Content Builder
+    * createAsset
+    * deleteAsset
 * DataExtension
     * name
     * isSendable
@@ -94,3 +97,5 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
 
    * 1.0.0
    * 1.1.0
+   * 1.1.1
+   * 1.2.0
