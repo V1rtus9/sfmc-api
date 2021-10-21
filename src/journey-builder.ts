@@ -156,7 +156,7 @@ export class JourneyBuilder {
 
     public async getJourney(id:string, versionNumber?: number): Promise<Journey> {
        return new Promise((resolve, reject) => {
-            /**
+        /**
          * 
          * Response example
             {
@@ -244,35 +244,26 @@ export class JourneyBuilder {
                 message: 'Not Found'
             }
          */
-        this.rest_.get(`/interaction/v1/interactions/${id}${versionNumber ? `?versionNumber=${versionNumber}` : ''}`)
-            .then(response => {
-                response.hasOwnProperty('errorcode') ? reject(response) : resolve(new Journey(response, this.rest_));
-            })
-            .catch(e => reject(e));
-       })
+
+        this.getRawJourney(id, versionNumber)
+            .then(item => resolve(new Journey(item, this.rest_)))
+            .catch(e => reject(e))
+       });
     }
 
-    public async getJourneys(props?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'} }): Promise<Array<Journey>>{
+    public async getRawJourney(id:string, versionNumber?: number): Promise<{[key: string]: any}> {
         return new Promise((resolve, reject) => {
-            const params: any = props || {};
-        const query = new URLSearchParams();
+         this.rest_.get(`/interaction/v1/interactions/${id}${versionNumber ? `?versionNumber=${versionNumber}` : ''}`)
+             .then(response => {
+                 response.hasOwnProperty('errorcode') ? reject(response) : resolve(new Journey(response, this.rest_));
+             })
+             .catch(e => reject(e));
+        })
+     }
+ 
 
-        Object.keys(params).forEach(key => {
-            switch(key){
-                case 'page':
-                case 'pageSize':
-                    query.append('$' + key, params[key])
-                    break;
-                case 'orderBy':
-                    query.append('$' + key, `${params[key].column} ${params[key].direction}`)
-                    break;
-                default:
-                    query.append(key, params[key]);
-            }
-        }); 
-        
-        const url = `/interaction/v1/interactions?${query.toString()}`;
-
+    public async getJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'} }): Promise<Array<Journey>>{
+        return new Promise((resolve, reject) => {
         /**
          * 
             {
@@ -322,14 +313,23 @@ export class JourneyBuilder {
                 ]
             }
          */
-        this.rest_.get(url)
-            .then(response => {
-                response.hasOwnProperty('errorcode') ? reject(response) : resolve(
-                    response.items ? 
-                    response.items.map((item: any) => new Journey(item, this.rest_)) : [])
-            })
+        
+        this.getRawJourneys(args)
+            .then(items => resolve(items.map((item: any) => new Journey(item, this.rest_))))
             .catch(e => reject(e));
         })
+    }
+
+    public async getRawJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'} }): Promise<Array<{[key: string]: any}>>{
+        return new Promise((resolve, reject) => {
+            const url = `/interaction/v1/interactions?${this.getJourneySearchQuery(args || {}).toString()}`;
+            this.rest_.get(url)
+                .then(response => {
+                    console.log(response);
+                    response.hasOwnProperty('errorcode') ? reject(response) : resolve(response.items || [])        
+                })
+                .catch(e => reject(e));
+        });
     }
 
     public async getJourneysCount(): Promise<number> {
@@ -340,6 +340,26 @@ export class JourneyBuilder {
                 })
                 .catch(e => reject(e));
         })
+    }
+
+    private getJourneySearchQuery(params: any): URLSearchParams {
+        const query = new URLSearchParams();
+
+        Object.keys(params).forEach(key => {
+            switch(key){
+                case 'page':
+                case 'pageSize':
+                    query.append('$' + key, params[key])
+                    break;
+                case 'orderBy':
+                    query.append('$' + key, `${params[key].column} ${params[key].direction}`)
+                    break;
+                default:
+                    query.append(key, params[key]);
+            }
+        }); 
+
+        return query;
     }
 }
 
