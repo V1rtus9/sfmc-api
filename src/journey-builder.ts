@@ -325,7 +325,6 @@ export class JourneyBuilder {
             const url = `/interaction/v1/interactions?${this.getJourneySearchQuery(args || {}).toString()}`;
             this.rest_.get(url)
                 .then(response => {
-                    console.log(response);
                     response.hasOwnProperty('errorcode') ? reject(response) : resolve(response.items || [])        
                 })
                 .catch(e => reject(e));
