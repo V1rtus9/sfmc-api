@@ -255,17 +255,16 @@ export class JourneyBuilder {
         return new Promise((resolve, reject) => {
          this.rest_.get(`/interaction/v1/interactions/${id}${versionNumber ? `?versionNumber=${versionNumber}` : ''}`)
              .then(response => {
-                 response.hasOwnProperty('errorcode') ? reject(response) : resolve(new Journey(response, this.rest_));
+                 response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
              })
              .catch(e => reject(e));
         })
-     }
- 
+    }
 
     public async getJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'} }): Promise<Array<Journey>>{
         return new Promise((resolve, reject) => {
         /**
-         * 
+         *
             {
                 count: 1,
                 page: 1,
