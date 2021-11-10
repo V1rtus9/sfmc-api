@@ -19,6 +19,12 @@ export default class SoapClient {
     public create = (type: string, props: {[key: string]: any}): Promise<any> => {
         return new Promise((resolve, reject) => {
             this._instance.create(type, props, {}, (err: ISoapError, response: any) => {
+                if(process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'debug') {
+                    if(err) {
+                        console.log(err);
+                    }
+                }
+
                 return err ? reject(err) : resolve(response.body);
             })
         })
@@ -27,6 +33,12 @@ export default class SoapClient {
     public retrieve = (type: string, props: Array<string>, options: any): Promise<any> => {
         return new Promise((resolve, reject) => {
             this._instance.retrieve(type, props, options, (err: ISoapError, response: any) => {
+                if(process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'debug') {
+                    if(err) {
+                        console.log(err);
+                    }
+                }
+
                 return err ? reject(err) : resolve(response.body);
             })
         })
@@ -39,6 +51,12 @@ export default class SoapClient {
     public delete = (type: string, props: {[key: string]: any}): Promise<any> => {
         return new Promise((resolve, reject) => {
             this._instance.delete(type, props, {}, (err: ISoapError, response: any) => {
+                if(process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'debug') {
+                    if(err) {
+                        console.log(err);
+                    }
+                }
+
                 return err ? reject(err) : resolve(response.body);
             })
         })
