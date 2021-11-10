@@ -59,7 +59,14 @@ export class DataExtension {
 
     //#region  Public methods
 
+    /**
+     * @deprecated
+     */
     public async name(): Promise<string> {
+        return this.getName();
+    }
+
+    public async getName(): Promise<string> {
         if(!this._name){
             await this.getProperties();
         }
@@ -75,7 +82,14 @@ export class DataExtension {
         return this._isSendable === 'true';
     }
 
+    /**
+     * @deprecated
+     */
     public async fields(): Promise<Array<string>> {
+        return this.getFields();
+    }
+
+    public async getFields(): Promise<Array<string>> {
         if(this._fields.length > 0){
             return this._fields;
         }
@@ -95,7 +109,7 @@ export class DataExtension {
             }
          */
         const {Results}: any = await this._soap.retrieve('DataExtensionField', ['Name'], {
-            filter:  {                     
+            filter:  {
                 leftOperand: 'DataExtension.CustomerKey',
                 operator: 'equals',
                 rightOperand: this._key
@@ -106,9 +120,16 @@ export class DataExtension {
         return this._fields;
     }
 
+    /**
+     * @deprecated
+     */
     public async count(): Promise<number> {
+        return this.getRowsCount();
+    }
+
+    public async getRowsCount(): Promise<number> {
         /**
-        *  Response example     
+        *  Response exampl
             {
                 links: {
                     self: '/v1/customobjectdata/token/3934bf37-a0a4-4312-94ba-b4b071079146/rowset?$page=1',
@@ -130,8 +151,15 @@ export class DataExtension {
         return response.count;
     }
 
-    public async rows(options?: {fields?: string[], filter?: IDataExtensionFilter}): Promise<Array<{[key: string]: string}>>{
-        const fields = options?.fields || await this.fields();
+    /**
+     * @deprecated
+     */
+    public async rows(options?: {fields?: string[], filter?: IDataExtensionFilter}): Promise<Array<{[key: string]: string}>> {
+        return this.getRows(options);
+    }
+
+    public async getRows(options?: {fields?: string[], filter?: IDataExtensionFilter}): Promise<Array<{[key: string]: string}>> {
+        const fields = options?.fields || await this.getFields();
         /**
          * Response example
             {
@@ -156,17 +184,28 @@ export class DataExtension {
             }
          *
          */
-        const {Results} = await this._soap.retrieve(`DataExtensionObject[${this._key}]`, fields, {
+        const { Results } = await this._soap.retrieve(`DataExtensionObject[${this._key}]`, fields, {
             filter: options?.filter
         });
 
         if(Array.isArray(Results)){
             return Results.map(item => {
-                const row:any = {};
-                item.Properties.Property.forEach(({Name, Value}: any) => {
-                    row[String(Name).toLocaleLowerCase()] = Value;
-                });
-                return row;
+                if(Array.isArray(item.Properties.Property)) {
+                    const row:any = {};
+                    item.Properties.Property.forEach(({Name, Value}: any) => {
+                        row[String(Name).toLocaleLowerCase()] = Value;
+                    });
+                    return row;
+                }
+
+                const property = item.Properties.Property;
+                if(property) {
+                    return {
+                        [String(property['Name']).toLocaleLowerCase()]: String(property['Value'])
+                    }
+                }
+
+                return undefined;
             });
         }
 
@@ -174,10 +213,16 @@ export class DataExtension {
     }
 
     /**
+     * @deprecated
+     */
+    public async rows2(page: number = 1): Promise<DataExtensionRow[]> {
+        return this.getRowsUnofficial(page);
+    }
+    /**
      * This methods uses unofficial rest endpoint, there is no guarantee that it will be working in future.
      * As opposed to the 'rows' method there is no any issue working with shared data extension, data is accessible from any business unit.
      */
-    public async rows2(page: number = 1): Promise<DataExtensionRow[]> {
+    public async getRowsUnofficial(page: number = 1): Promise<DataExtensionRow[]> {
        /**
         *  Response example     
             {
@@ -236,7 +281,7 @@ export class DataExtension {
         ];
 
         /**
-         * 
+         *
             {
                 OverallStatus: 'OK',
                 RequestID: 'bd41831c-0b28-4d72-bb81-ac46f28c7c57',
@@ -250,9 +295,9 @@ export class DataExtension {
                     }
                 ]
             }
-         * 
+         *
          */
-        const {Results}: any = await this._soap.retrieve('DataExtension', props, {                     
+        const {Results}: any = await this._soap.retrieve('DataExtension', props, {
             filter: { leftOperand: 'DataExtension.CustomerKey',
              operator: 'equals',
              rightOperand: this._key}
