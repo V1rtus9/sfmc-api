@@ -26,7 +26,7 @@ export class Journey {
     constructor(data: any, rest: RestClient) {
         this.raw = data;
         this.rest_ = rest;
-        
+
         this.id = data.id;
         this.name = data.name;
         this.status = data.status;
@@ -106,13 +106,16 @@ export class Journey {
         })
     }
 
-    async publish(): Promise<{status: string}> {
+    async publish(): Promise<{statusUrl: string, statusId: string}> {
         return new Promise((resolve, reject) => {
             this.rest_.post(`/interaction/v1/interactions/publishAsync/${this.id}?versionNumber=${this.version}`, {})
                 .then(response => {
                     /**
-                     * { status: 'Accepted' }
-                     * 
+                     *  {
+                            statusUrl: '/interaction/v1/interactions/publishStatus/8b95543a-a468-4cc7-ba43-d3e90e07038d',
+                            statusId: '8b95543a-a468-4cc7-ba43-d3e90e07038d'
+                        }
+                     *
                      * Error example
                         {
                             message: 'An interaction must be in published or unpublished status to be paused.',
@@ -132,7 +135,7 @@ export class Journey {
             delete this.raw.id
             delete this.raw.version;
             delete this.raw.definitionId;
-    
+
             this.raw.status = JourneyStatus.Draft;
             this.rest_.post(`/interaction/v1/interactions`, this.raw)
                 .then(response => {
@@ -261,7 +264,7 @@ export class JourneyBuilder {
         })
     }
 
-    public async getJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'} }): Promise<Array<Journey>>{
+    public async getJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc', status: 'Draft' | 'Published' | 'ScheduledToPublish' | 'Stopped' | 'Unpublished' | 'Deleted'} }): Promise<Array<Journey>>{
         return new Promise((resolve, reject) => {
         /**
          *
@@ -312,19 +315,19 @@ export class JourneyBuilder {
                 ]
             }
          */
-        
+
         this.getRawJourneys(args)
             .then(items => resolve(items.map((item: any) => new Journey(item, this.rest_))))
             .catch(e => reject(e));
         })
     }
 
-    public async getRawJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'} }): Promise<Array<{[key: string]: any}>>{
+    public async getRawJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc', status: 'Draft' | 'Published' | 'ScheduledToPublish' | 'Stopped' | 'Unpublished' | 'Deleted'} }): Promise<Array<{[key: string]: any}>>{
         return new Promise((resolve, reject) => {
             const url = `/interaction/v1/interactions?${this.getJourneySearchQuery(args || {}).toString()}`;
             this.rest_.get(url)
                 .then(response => {
-                    response.hasOwnProperty('errorcode') ? reject(response) : resolve(response.items || [])        
+                    response.hasOwnProperty('errorcode') ? reject(response) : resolve(response.items || [])
                 })
                 .catch(e => reject(e));
         });
