@@ -264,7 +264,7 @@ export class JourneyBuilder {
         })
     }
 
-    public async getJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc', status: 'Draft' | 'Published' | 'ScheduledToPublish' | 'Stopped' | 'Unpublished' | 'Deleted'} }): Promise<Array<Journey>>{
+    public async getJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'}, status: 'Draft' | 'Published' | 'ScheduledToPublish' | 'Stopped' | 'Unpublished' | 'Deleted' }): Promise<Array<Journey>>{
         return new Promise((resolve, reject) => {
         /**
          *
@@ -322,7 +322,7 @@ export class JourneyBuilder {
         })
     }
 
-    public async getRawJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc', status: 'Draft' | 'Published' | 'ScheduledToPublish' | 'Stopped' | 'Unpublished' | 'Deleted'} }): Promise<Array<{[key: string]: any}>>{
+    public async getRawJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'}, status: 'Draft' | 'Published' | 'ScheduledToPublish' | 'Stopped' | 'Unpublished' | 'Deleted' }): Promise<Array<{[key: string]: any}>>{
         return new Promise((resolve, reject) => {
             const url = `/interaction/v1/interactions?${this.getJourneySearchQuery(args || {}).toString()}`;
             this.rest_.get(url)
