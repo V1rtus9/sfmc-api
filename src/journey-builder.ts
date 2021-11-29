@@ -9,6 +9,12 @@ export enum JourneyStatus {
     ScheduledToPublish = 'ScheduledToPublish'
 }
 
+export enum JourneyPublishStatus {
+    Error = 'Error',
+    PublishInProcess = 'PublishInProcess',
+    PublishCompleted = 'PublishCompleted'
+}
+
 export class Journey {
     /**
      * Raw journey
@@ -130,7 +136,44 @@ export class Journey {
         });
     }
 
+    /**
+     * @deprecated
+     * Please use createNewVersion instead
+     */
     async newVersion(): Promise<void> {
+        return this.createNewVersion();
+    }
+
+    getPublishStatus = (statusId: string): Promise<{ status: string, errors: Array<{ errorDetail: string,  errorCode: string, additionalInfo: {[key: string]: any} }>}> => {
+        return new Promise((resolve, reject) => {
+            this.rest_.get(`/interaction/v1/interactions/publishStatus/${statusId}`, {})
+                .then(response => {
+                    /**
+                     * { status: 'PublishInProcess', errors: [] }
+                     * { status: 'PublishCompleted', errors: [] }
+                     * {
+                            status: 'Error',
+                            errors: [
+                                {
+                                errorDetail: 'This Email activity is not configured. Configure all activities before activating.',
+                                errorCode: '121331',
+                                additionalInfo:  {
+                                        activityKey: 'EMAILV2-1',
+                                        activityId: 'cf732c8f-2475-4596-906a-7c81b1f8b659',
+                                        activityType: 'EMAILV2',
+                                        definitionId: 'e844fc1a-6ce0-4d26-9185-89081171d1de'
+                                    }
+                                }
+                            ]
+                        }
+                     */
+                   response.hasOwnProperty('status') ? resolve(response) : reject(response);
+                })
+                .catch(e => reject(e));
+        });
+    }
+
+    async createNewVersion(): Promise<void> {
         return new Promise((resolve, reject) => {
             delete this.raw.id
             delete this.raw.version;
