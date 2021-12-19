@@ -17,12 +17,12 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
     * createAsset
     * deleteAsset
 * DataExtension
-    * name
+    * getName
     * isSendable
-    * fields
-    * count
-    * rows
-    * rows2 (unofficial)
+    * getFields
+    * getCount
+    * getRows
+    * getRows2 (unofficial)
     * insertOrUpdate
 * Journey Builder
     * getJourney
