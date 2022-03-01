@@ -1,37 +1,23 @@
 import RestClient from './clients/rest';
-
-export enum JourneyStatus {
-    Draft = 'Draft',
-    Stopped = 'Stopped', 
-    Deleted = 'Deleted',
-    Published = 'Published',
-    Unpublished = 'Unpublished', 
-    ScheduledToPublish = 'ScheduledToPublish'
-}
-
-export enum JourneyPublishStatus {
-    Error = 'Error',
-    PublishInProcess = 'PublishInProcess',
-    PublishCompleted = 'PublishCompleted'
-}
+import { JourneyStatus } from './models/journey';
 
 export class Journey {
-    /**
-     * Raw journey
-     * Objects that comes from MC
-     */
-    private raw: any;
 
     public id: string;
     public name: string;
     public version: number;
     public status: JourneyStatus;
 
-    private rest_: RestClient;
+    private restClient: RestClient;
+    /**
+     * Raw journey
+     * Objects that comes from MC
+     */
+    private originalObject: {[key: string]: any};
 
-    constructor(data: any, rest: RestClient) {
-        this.raw = data;
-        this.rest_ = rest;
+    constructor (data: any, restClient: RestClient) {
+        this.originalObject = data;
+        this.restClient = restClient;
 
         this.id = data.id;
         this.name = data.name;
@@ -39,13 +25,17 @@ export class Journey {
         this.version = data.version;
     }
 
-    async stop(): Promise<{status: string}> {
+    public getRawObject() {
+        return this.originalObject;
+    };
+
+    public async stop(): Promise<{status: string}> {
         return new Promise((resolve, reject) => {
-            this.rest_.post(`/interaction/v1/interactions/stop/${this.id}?versionNumber=${this.version}`, {})
-                .then(response => {
+            this.restClient.post(`/interaction/v1/interactions/stop/${this.id}?versionNumber=${this.version}`, {})
+                .then((response: any) => {
                     /**
                      * { status: 'Accepted' }
-                     * 
+                     *
                      * Error example
                         {
                             message: 'Published/Paused/Unpublished interaction matching criteria not found.',
@@ -56,17 +46,17 @@ export class Journey {
                     */
                    response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
-                .catch(e => reject(e));
+                .catch((e: Error) => reject(e));
         });
     }
 
-    async pause(): Promise<{status: string}> {
+    public async pause(): Promise<{status: string}> {
         return new Promise((resolve, reject) => {
-            this.rest_.post(`/interaction/v1/interactions/pause/${this.id}?versionNumber=${this.version}`, {})
-                .then(response => {
+            this.restClient.post(`/interaction/v1/interactions/pause/${this.id}?versionNumber=${this.version}`, {})
+                .then((response: any) => {
                     /**
                      * { status: 'Accepted' }
-                     * 
+                     *
                      * Error example
                         {
                             message: 'An interaction must be in published or unpublished status to be paused.',
@@ -77,17 +67,17 @@ export class Journey {
                     */
                    response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
-                .catch(e => reject(e));
+                .catch((e: Error) => reject(e));
         });
     }
 
-    async resume(): Promise<{status: string}> {
+    public async resume(): Promise<{status: string}> {
         return new Promise((resolve, reject) => {
-            this.rest_.post(`/interaction/v1/interactions/resume/${this.id}?versionNumber=${this.version}`, {})
-                .then(response => {
+            this.restClient.post(`/interaction/v1/interactions/resume/${this.id}?versionNumber=${this.version}`, {})
+                .then((response: any) => {
                     /**
                      * { status: 'Accepted' }
-                     * 
+                     *
                      * Error example
                         {
                             message: 'An interaction must be in paused status to be resumed.',
@@ -98,24 +88,24 @@ export class Journey {
                     */
                    response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
-                .catch(e => reject(e));
+                .catch((e: Error) => reject(e));
         });
     }
 
-    async update(data: any): Promise<any> {
+    public async update(data: any): Promise<any> {
         return new Promise((resolve, reject) => {
-            this.rest_.put(`/interaction/v1/interactions/?versionNumber=${this.version}`, data)
-                .then(response => {
+            this.restClient.put(`/interaction/v1/interactions/?versionNumber=${this.version}`, data)
+                .then((response: any) => {
                     response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
-                .catch(e => reject(e));
+                .catch((e: Error) => reject(e));
         })
     }
 
-    async publish(): Promise<{statusUrl: string, statusId: string}> {
+    public async publish(): Promise<{statusUrl: string, statusId: string}> {
         return new Promise((resolve, reject) => {
-            this.rest_.post(`/interaction/v1/interactions/publishAsync/${this.id}?versionNumber=${this.version}`, {})
-                .then(response => {
+            this.restClient.post(`/interaction/v1/interactions/publishAsync/${this.id}?versionNumber=${this.version}`, {})
+                .then((response: any) => {
                     /**
                      *  {
                             statusUrl: '/interaction/v1/interactions/publishStatus/8b95543a-a468-4cc7-ba43-d3e90e07038d',
@@ -132,22 +122,14 @@ export class Journey {
                     */
                    response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
                 })
-                .catch(e => reject(e));
+                .catch((e: Error) => reject(e));
         });
     }
 
-    /**
-     * @deprecated
-     * Please use createNewVersion instead
-     */
-    async newVersion(): Promise<void> {
-        return this.createNewVersion();
-    }
-
-    getPublishStatus = (statusId: string): Promise<{ status: string, errors: Array<{ errorDetail: string,  errorCode: string, additionalInfo: {[key: string]: any} }>}> => {
+    public getPublishStatus = (statusId: string): Promise<{ status: string, errors: Array<{ errorDetail: string,  errorCode: string, additionalInfo: {[key: string]: any} }>}> => {
         return new Promise((resolve, reject) => {
-            this.rest_.get(`/interaction/v1/interactions/publishStatus/${statusId}`, {})
-                .then(response => {
+            this.restClient.get(`/interaction/v1/interactions/publishStatus/${statusId}`, {})
+                .then((response: any) => {
                     /**
                      * { status: 'PublishInProcess', errors: [] }
                      * { status: 'PublishCompleted', errors: [] }
@@ -169,41 +151,41 @@ export class Journey {
                      */
                    response.hasOwnProperty('status') ? resolve(response) : reject(response);
                 })
-                .catch(e => reject(e));
+                .catch((e: Error) => reject(e));
         });
     }
 
     async createNewVersion(): Promise<void> {
         return new Promise((resolve, reject) => {
-            delete this.raw.id
-            delete this.raw.version;
-            delete this.raw.definitionId;
+            delete this.originalObject.id
+            delete this.originalObject.version;
+            delete this.originalObject.definitionId;
 
-            this.raw.status = JourneyStatus.Draft;
-            this.rest_.post(`/interaction/v1/interactions`, this.raw)
-                .then(response => {
+            this.originalObject.status = JourneyStatus.Draft;
+            this.restClient.post(`/interaction/v1/interactions`, this.originalObject)
+                .then((response: any) => {
                     response.hasOwnProperty('errorcode') ? reject(response) : (() => {
                         resolve();
-                        this.raw = response;
+                        this.originalObject = response;
                         this.version = response.version;
                     })();
                 })
-                .catch(e => reject(e));
+                .catch((e: Error) => reject(e));
         })
     }
 }
 
 export class JourneyBuilder {
-    private rest_: RestClient;
+    private restClient: RestClient;
 
-    constructor(rest: RestClient){
-        this.rest_ = rest;
+    constructor(restClient: RestClient){
+        this.restClient = restClient;
     }
 
     public async getJourney(id:string, versionNumber?: number): Promise<Journey> {
        return new Promise((resolve, reject) => {
         /**
-         * 
+         *
          * Response example
             {
                 id: '03ca2399-818f-44fa-9baa-106a1d3d0728',
@@ -281,9 +263,9 @@ export class JourneyBuilder {
                 definitionId: '03ca2399-818f-44fa-9baa-106a1d3d0728',
                 scheduledStatus: 'Draft'
             }
-         * 
+         *
          * Error response example
-         * 
+         *
             {
                 documentation: 'https://developer.salesforce.com/docs/atlas.en-us.mc-apis.meta/mc-apis/error-handling.htm',
                 errorcode: 404,
@@ -292,18 +274,18 @@ export class JourneyBuilder {
          */
 
         this.getRawJourney(id, versionNumber)
-            .then(item => resolve(new Journey(item, this.rest_)))
+            .then(item => resolve(new Journey(item, this.restClient)))
             .catch(e => reject(e))
        });
     }
 
     public async getRawJourney(id:string, versionNumber?: number): Promise<{[key: string]: any}> {
         return new Promise((resolve, reject) => {
-         this.rest_.get(`/interaction/v1/interactions/${id}${versionNumber ? `?versionNumber=${versionNumber}` : ''}`)
-             .then(response => {
+         this.restClient.get(`/interaction/v1/interactions/${id}${versionNumber ? `?versionNumber=${versionNumber}` : ''}`)
+             .then((response: any) => {
                  response.hasOwnProperty('errorcode') ? reject(response) : resolve(response);
              })
-             .catch(e => reject(e));
+             .catch((e: Error) => reject(e));
         })
     }
 
@@ -360,7 +342,7 @@ export class JourneyBuilder {
          */
 
         this.getRawJourneys(args)
-            .then(items => resolve(items.map((item: any) => new Journey(item, this.rest_))))
+            .then(items => resolve(items.map((item: any) => new Journey(item, this.restClient))))
             .catch(e => reject(e));
         })
     }
@@ -368,21 +350,21 @@ export class JourneyBuilder {
     public async getRawJourneys(args?: {nameOrDescription?: string, page?: number, pageSize?: number, orderBy?: {column: 'modifieddate' | 'name' |'performance', direction: 'asc' | 'desc'}, status?: 'Draft' | 'Published' | 'ScheduledToPublish' | 'Stopped' | 'Unpublished' | 'Deleted' }): Promise<Array<{[key: string]: any}>>{
         return new Promise((resolve, reject) => {
             const url = `/interaction/v1/interactions?${this.getJourneySearchQuery(args || {}).toString()}`;
-            this.rest_.get(url)
-                .then(response => {
+            this.restClient.get(url)
+                .then((response: any) => {
                     response.hasOwnProperty('errorcode') ? reject(response) : resolve(response.items || [])
                 })
-                .catch(e => reject(e));
+                .catch((e: Error) => reject(e));
         });
     }
 
     public async getJourneysCount(): Promise<number> {
         return new Promise((resolve, reject) => {
-            this.rest_.get(`/interaction/v1/interactions?$page=1&$pageSize=1`)
-                .then(response => {
+            this.restClient.get(`/interaction/v1/interactions?$page=1&$pageSize=1`)
+                .then((response: any) => {
                     response.hasOwnProperty('errorcode') ? reject(response) : resolve(response.count);
                 })
-                .catch(e => reject(e));
+                .catch((e: Error) => reject(e));
         })
     }
 
@@ -401,7 +383,7 @@ export class JourneyBuilder {
                 default:
                     query.append(key, params[key]);
             }
-        }); 
+        });
 
         return query;
     }
