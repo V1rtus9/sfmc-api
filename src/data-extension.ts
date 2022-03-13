@@ -1,6 +1,6 @@
 import RestClient from "./clients/rest";
 import SoapClient from "./clients/soap";
-import { IDataExtensionFilter } from "./interfaces/data-extension/filter";
+import { IDataExtensionFilter } from "./models/data-extension/filter";
 
 export class DataExtensionRow {
     private _keys: {[key: string]: string};
@@ -216,19 +216,19 @@ export class DataExtension {
      * @deprecated
      */
     public async rows2(page: number = 1): Promise<DataExtensionRow[]> {
-        return this.getRowsUnofficial(page);
+        return this.getRowsUnofficial({ page });
     }
     /**
-     * This methods uses unofficial rest endpoint, there is no guarantee that it will be working in future.
+     * This methods uses unofficial rest endpoint, there is no guarantee that it will be working in the future.
      * As opposed to the 'rows' method there is no any issue working with shared data extension, data is accessible from any business unit.
      */
-    public async getRowsUnofficial(page: number = 1): Promise<DataExtensionRow[]> {
+    public async getRowsUnofficial({ page, pageSize }: { page?: number, pageSize?: number }): Promise<DataExtensionRow[]> {
        /**
-        *  Response example     
+        *  Response example
             {
                 links: {
                     self: '/v1/customobjectdata/token/3934bf37-a0a4-4312-94ba-b4b071079146/rowset?$page=1',
-                    next: '/v1/customobjectdata/token/3934bf37-a0a4-4312-94ba-b4b071079146/rowset?$page=2' 
+                    next: '/v1/customobjectdata/token/3934bf37-a0a4-4312-94ba-b4b071079146/rowset?$page=2'
                 },
                 requestToken: '3934bf37-a0a4-4312-94ba-b4b071079146',
                 tokenExpireDateUtc: '2021-07-11T20:11:29.59',
@@ -242,7 +242,8 @@ export class DataExtension {
             }
         *
         */
-        const {items} = await this._rest.get(`/data/v1/customobjectdata/key/${this._key}/rowset?$page=${page}`);
+        const url = `/data/v1/customobjectdata/key/${this._key}/rowset?$page=${page || 1}&$pageSize=${pageSize || 50}`;
+        const { items } = await this._rest.get(url);
 
         if(Array.isArray(items)){
             return items.map(item => {
@@ -268,7 +269,7 @@ export class DataExtension {
         })
     }
 
-    //#endregion 
+    //#endregion
 
     //#region Private methods
 

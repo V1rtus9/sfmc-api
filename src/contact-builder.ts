@@ -3,7 +3,7 @@ const {v4: uuidv4} = require('uuid');
 import RestClient from "./clients/rest";
 import SoapClient from "./clients/soap";
 import { DataExtension } from "./data-extension";
-import { IDataExtensionField } from "./interfaces/data-extension/field";
+import { IDataExtensionField } from "./models/data-extension/field";
 
 export class ContactBuilder {
 
@@ -37,7 +37,7 @@ export class ContactBuilder {
 
     async createDataExtension(props: {name: string, description?: string, fields: IDataExtensionField[]}): Promise<DataExtension> {
         const key = String(uuidv4()).toUpperCase();
-        
+
         /**
          * Response example:
             {
@@ -104,10 +104,10 @@ export class ContactBuilder {
             CustomerKey: key
         });
 
-        const {OverallStatus} = response;
+        const { OverallStatus } = response;
 
-        if(OverallStatus !== 'OK'){
+        if (OverallStatus !== 'OK'){
             throw new Error(`Response: ${JSON.stringify(response)}`);
-        }     
+        }
     }
 }

@@ -5,13 +5,13 @@ import SoapClient from './clients/soap';
 import RestClient from './clients/rest';
 
 import {
-    DataExtension, 
-    DataExtensionRow} from './data-extension';
+    DataExtension,
+    DataExtensionRow } from './data-extension';
+import { ITokenContext } from './models/context';
 import { ContentBuilder } from './content-builder';
 import { JourneyBuilder } from './journey-builder';
 import { ContactBuilder } from './contact-builder';
-import { ITokenContext } from './interfaces/context';
-import { IApiClientOptions } from './interfaces/options';
+import { IApiClientOptions } from './models/options';
 export {
     SfmcApi,
     Platform,
@@ -22,7 +22,7 @@ class SfmcApi {
 
     private _restClient: RestClient;
     private _soapClient: SoapClient;
-    
+
     constructor({clientId, clientSecret, subdomain, accountId}: IApiClientOptions){
         if(!clientId) throw new Error('Client ID is missing!');
         if(!subdomain) throw new Error('Subdomain is missing!');
@@ -47,7 +47,7 @@ class SfmcApi {
         this._soapClient = new SoapClient(instance.SoapClient);
     }
 
-    //#region Getters 
+    //#region Getters
 
     public get rest(): RestClient {
         return this._restClient;

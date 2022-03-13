@@ -1,12 +1,12 @@
-type TFilterOperator = 
+type TFilterOperator =
     'OR' |
     'AND' |
     'isNull' |
-    'equals' | 
+    'equals' |
     'lessThan' |
     'isNotNull' |
-    'notEquals' | 
-    'greaterThan' | 
+    'notEquals' |
+    'greaterThan' |
     'lessThanOrEqual' |
     'greaterThanOrEqual';
 
