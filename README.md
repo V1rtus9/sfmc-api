@@ -89,13 +89,41 @@ The Sfmc Api for Node provides fast and easy access to Salesforce Marketing Clou
     const journeysCount = await jb.getJourneysCount();
 ```
 
+## Rest Client
+
+Thanks for the rest client it is possible to use any rest endpoint from the documentation
+
+```js
+    instance.rest.get(`/interaction/v1/eventDefinitions/key:${eventDefinitionKey}`);
+```
+
+Implemented rest client supports following methods `get`, `put`, `post`, `delete`.
+
+## Soap Client
+
+```js
+ const response: any = await soapClient.retrieve(
+        "DataExtension",
+        [
+            "Name",
+            "ObjectID",
+            "IsSendable",
+            "DataExtension.CustomerKey",
+            "SendableDataExtensionField.Name",
+            "SendableSubscriberField.Name",
+        ],
+        {
+            filter: {
+                leftOperand: "DataExtension.CustomerKey",
+                operator: "equals",
+                rightOperand: externalKey,
+            },
+        }
+    );
+```
+
+Implemented soap client supports following actions `retrieve`, `create`, `update`, `delete`.
+
 ## Usage:
 
 [`Examples`](https://github.com/V1rtus9/sfmc-api/tree/master/tests)
-
-## Versions:
-
-   * 1.0.0
-   * 1.1.0
-   * 1.1.1
-   * 1.2.0
